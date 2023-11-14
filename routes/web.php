@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MovieController;
+use App\Http\Controllers\RatingController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -17,12 +19,7 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return redirect(route('movies.index'));
 })->name('home');
 
 Route::get('/dashboard', function () {
@@ -34,5 +31,16 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
+Route::group(["prefix" => "/movies", "as" => "movies."],function (){
+
+    Route::post("/search", [MovieController::class, 'search'])->name("search");
+    Route::get("/", [MovieController::class, 'index'])->name('index');
+    Route::get("/{id}", [MovieController::class, 'show'])->name('show');
+    Route::get("/test", [MovieController::class, 'test'])->name('test');
+    Route::post('/rating',[RatingController::class, 'rate'])->name('rate')->middleware('auth');
+});
+
 
 require __DIR__.'/auth.php';
